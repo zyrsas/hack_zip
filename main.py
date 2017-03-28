@@ -1,10 +1,9 @@
 #coding: utf8
 import sys
-import os
-import time
 import zipfile
 import threading
 import generate_word
+import time
 import PyQt5.QtCore
 from PyQt5.QtWidgets import QApplication, QDialog
 from PyQt5.uic import loadUiType
@@ -66,14 +65,17 @@ class MainWindow(QDialog, form_class):
 
     def brute_start(self):
         self.txtStatus.append("Start...")
+
+        self.startTime = time.time()
         with open(self.dict) as f:
-                for line in f:
-                    if self.flag:
-                        return
-                    password = line.strip("\n").encode()
-                    self.t = threading.Thread(target=self.brute_dict, args=[password])
-                    self.t.start()
-                    time.sleep(0.00005)
+            for line in f:
+                if self.flag:
+                    print("Elapsed time: {:.3f} sec".format(time.time() - self.startTime))
+                    self.txtStatus.append("Elapsed time: {:.3f} sec".format(time.time() - self.startTime))
+                    return
+                password = line.strip("\n").encode()
+                self.t = threading.Thread(target=self.brute_dict, args=[password])
+                self.t.start()
 
     def brute_bust(self):
         self.txtStatus.append("Start...")
@@ -97,14 +99,16 @@ class MainWindow(QDialog, form_class):
         length = int(self.edtLen.text())
         p = generate_word.EndsWithEngine(string_length=length, char_list=LIST)
         pwd = ''
+        self.startTime = time.time()
         for password in p.generator():
             if self.flag:
+                print("Elapsed time: {:.3f} sec".format(time.time() - self.startTime))
+                self.txtStatus.append("Elapsed time: {:.3f} sec".format(time.time() - self.startTime))
                 return
             pwd = ''.join(password)
             pwd = pwd.encode()
             self.t = threading.Thread(target=self.brute_dict, args=[pwd])
             self.t.start()
-            time.sleep(0.00005)
 
 
 
